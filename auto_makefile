@@ -1,0 +1,27 @@
+#!/bin/bash
+
+files_c=$(find . -name "*.c" | sed 's|^./||')
+files_h=$(find . -name "*.h" | sed 's|^./||')
+objects=$(printf "$files_c" | sed 's/\.c$/.o/')
+
+printf "CC=gcc\n" > Makefile
+printf "CFLAGS=-Wall -g\n" >> Makefile
+printf "OBJ=$objects\n" >> Makefile
+printf "TARGET=main_file\n" >> Makefile
+printf "\n" >> Makefile
+printf "all:\$(TARGET)\n" >> Makefile
+printf "\n" >> Makefile
+printf "\$(TARGET): \$(OBJ)\n" >> Makefile
+printf "\t\$(CC) \$(CFLAGS) -o \$(TARGET) \$(OBJ)\n" >> Makefile
+printf "\n" >> Makefile
+
+for file in $files_c; do
+    obj=$(printf "$file" | sed 's/\.c$/.o/')
+    printf "$obj: $file\n" >> Makefile
+    printf "\t\$(CC) \$(CFLAGS) -c $file -o $obj\n" >> Makefile
+    printf "\n" >> Makefile
+done
+
+printf "clean:\n" >> Makefile
+printf "\trm -f \$(TARGET) \$(OBJ)\n" >> Makefile
+
